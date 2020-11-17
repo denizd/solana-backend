@@ -2,16 +2,19 @@ package fileaccess
 
 import java.io.*
 import java.math.BigInteger
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.security.MessageDigest
 
 /**
  * Retrieves a file from the file system by accessing it through
- * its absolute path.
+ * its absolute path. Creates the file if it doesn't already exist.
  *
- * @param   absolutePath the path to the file
+ * @param   path the path to the file
  * @return  the file
  */
-fun getFile(absolutePath: String): File = File(absolutePath)
+fun getFile(path: String): Path = Files.createDirectories(Paths.get(path))
 
 /**
  * Calculates the MD5 hash sum of a file for verification.
@@ -24,17 +27,16 @@ fun getFile(absolutePath: String): File = File(absolutePath)
  *              the file
  */
 @Throws(IOException::class)
-fun File.getMD5Hash(): String {
+fun Path.getMD5Hash(): String {
     val digest: MessageDigest = MessageDigest.getInstance("MD5")
-    val stream: InputStream = FileInputStream(this)
+    val stream: InputStream = Files.newInputStream(this)
     val buffer = ByteArray(8192)
 
     var read: Int
     while (stream.read(buffer).also { read = it } > 0) {
         digest.update(buffer, 0, read)
     }
-    val bigInt = BigInteger(1, digest.digest())
-    var output = bigInt.toString(16)
+    val output = BigInteger(1, digest.digest()).toString(16)
     stream.close()
     // Fill to 32 chars and convert letters to uppercase
     return String.format("%32s", output).replace(' ', '0').toUpperCase()

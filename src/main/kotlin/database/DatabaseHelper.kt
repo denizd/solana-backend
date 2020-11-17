@@ -1,6 +1,5 @@
 package database
 
-import data.FileIdentifier
 import data.SolanaFile
 import java.sql.ResultSet
 
@@ -13,7 +12,7 @@ import java.sql.ResultSet
  * @return      an object of type SolanaFile
  */
 fun ResultSet.getSolanaFile(): SolanaFile =
-    SolanaFile(getInt("id"), getString("file_name"), getString("hash"), getString("type"))
+    SolanaFile(getString("file_name"), getString("type"), getString("hash"), getInt("id"))
 
 /**
  * Checks if a given file exists based on its file name as well as
@@ -25,19 +24,19 @@ fun ResultSet.getSolanaFile(): SolanaFile =
  * attempt or an upload of an image that already exists in the database,
  * but the user may be unaware of, which might otherwise create confusion.
  *
- * This function uses the [FileIdentifier] class to enable checking of a
+ * This function uses the [SolanaFile] class to enable checking of a
  * file's existence based on its file name as well as its hash without
  * uploading the file's contents, as that would consume substantially
  * more bandwidth and device resources.
  *
  * @receiver    the database to read from
- * @param       fileIdentifier a bundle of file name and hash to check
+ * @param       checkedFile identifying information for the checked file
  * @return      whether the file exists, based on whether file name and hash
  *              are found in the database
  */
-fun SolanaDatabase.checkIfFileExists(fileIdentifier: FileIdentifier): Boolean {
-    this.getAllFiles().also {println(it)}.filter { it.fileIdentifier.fileName == fileIdentifier.fileName }.forEach { file ->
-        if (file.fileIdentifier.hash == fileIdentifier.hash) return true
+fun SolanaDatabase.checkIfFileExists(checkedFile: SolanaFile): Boolean {
+    this.getAllFiles().filter { it.fileName == checkedFile.fileName }.forEach { file ->
+        if (file.hash == checkedFile.hash) return true
     }
     return false
 }

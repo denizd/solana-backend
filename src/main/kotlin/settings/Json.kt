@@ -1,14 +1,15 @@
 package settings
 
-import util.getFile
+import fileaccess.getFile
 import util.indicesOf
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 
-class Json(inputFile: File) {
+class Json(inputFile: Path) {
 
     constructor(inputFilePath: String) : this(getFile(inputFilePath))
 
-    val entries = inputFile.readText().split("\n").filter { it.isNotBlank() }.map { entry ->
+    val entries = Files.readAllLines(inputFile).filter { it.isNotBlank() }.map { entry ->
         val indices = entry.indicesOf('"')
         Pair(entry.substring(indices[0] + 1..indices[1]), entry.substring(indices[2] + 1..indices[3]))
     }.toMap()

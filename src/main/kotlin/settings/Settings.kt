@@ -1,10 +1,10 @@
 package settings
 
-import util.SETTINGS_FILE
+import fileaccess.Directories
 
 class Settings {
 
-    private val settingsFile = Json(SETTINGS_FILE)
+    private val settingsFile = Json(Directories.SETTINGS_FILE)
 
 //    init {
 //        if ()
